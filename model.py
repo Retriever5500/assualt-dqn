@@ -2,5 +2,5 @@ import torch
 import torch.nn as nn
 
 # TODO
-class DQN(nn.Module):
+class DQNNet(nn.Module):
     pass
