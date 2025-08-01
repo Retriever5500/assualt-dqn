@@ -20,7 +20,7 @@ class DQNNet(nn.Module):
         # reLU should be applied on the outputs
         self.conv3 = nn.Conv2d(inchannels=64, out_channels=64, kernel_size= (3, 3), stride=1)
 
-        # flattening should be applied here feeding into fc1
+        # flattening should be applied here before feeding into fc1
 
         # in: 64 * 7 * 7 = (3136, ) - out: (512, ) 
         # reLU should be applied on the outputs
@@ -39,7 +39,6 @@ class DQNNet(nn.Module):
         x = self.conv3(x)
         x = nn.ReLU(x)
 
-        # TOOD: I GOTTA CHECK *start_dim* LATER.
         x = nn.Flatten(start_dim=1, end_dim=-1)
 
         x = self.fc1(x)
