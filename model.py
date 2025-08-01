@@ -45,7 +45,4 @@ class DQNNet(nn.Module):
         x = self.fc1(x)
         x = nn.ReLU(x)
 
-        x = self.fc2(x)
-        return nn.ReLU(x)
-         
-        
+        return self.fc2(x)
