@@ -3,8 +3,9 @@ import torch.nn as nn
 
 # TODO
 class DQNNet(nn.Module):
-    def __init__(self):
+    def __init__(self, num_of_actions):
         super(DQNNet, self).__init__()
+        self.num_of_actions = num_of_actions
 
         # images should be preprocessed (extract luminance channel from RGB channels) by φ defined in the paper.
 
@@ -27,7 +28,7 @@ class DQNNet(nn.Module):
         self.fc1 = nn.Linear(in_features=3136, out_features=512)
 
         # in: (512, ) - out: (7, )
-        self.fc2 = nn.Linear(in_features=512, out_features=7)
+        self.fc2 = nn.Linear(in_features=512, out_features=num_of_actions)
 
     def forward(self, x):
         x = self.conv1(x)
