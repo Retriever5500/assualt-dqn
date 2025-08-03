@@ -18,7 +18,7 @@ class Agent:
         self.num_of_actions = num_of_actions
         if(network == None):
             network = DQNNet(num_of_actions)
-        self.network = network
+        self.network = network.to(device)
         self.target_network = copy.deepcopy(network)
         self.target_interval = target_interval
         self.learn_count = 0
@@ -32,7 +32,7 @@ class Agent:
         self.gamma = gamma
         self.min_training_step = min_training_step
 
-        self.memory = Memory(max_num_transitions=max_num_transitions, mini_batch_size=32)
+        self.memory = Memory(max_num_transitions=max_num_transitions, mini_batch_size=32, device=device)
         self.device = device
 
     def load_model(self, model_path):

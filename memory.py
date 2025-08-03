@@ -2,10 +2,11 @@ import numpy as np
 import torch
 
 class Memory:
-    def __init__(self, max_num_transitions, mini_batch_size):
+    def __init__(self, max_num_transitions, mini_batch_size, device="cpu"):
         self.lst = []
         self.max_num_transitions = max_num_transitions
         self.mini_batch_size = mini_batch_size
+        self.device = device
 
     # this function returns the number of stored transitions
     def __len__(self):
@@ -29,7 +30,7 @@ class Memory:
         dtypes = [torch.float32, torch.int, torch.bool, torch.float32, torch.float32]
 
         mini_batch = [
-            torch.tensor(np.array(zipped_content[i]), dtype=dtypes[i])
+            torch.tensor(np.array(zipped_content[i]), dtype=dtypes[i]).to(self.device)
             for i in range(len(zipped_content))
         ]
         
