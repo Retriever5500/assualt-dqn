@@ -32,7 +32,7 @@ class Agent:
         self.gamma = gamma
         self.min_training_step = min_training_step
 
-        self.memory = Memory(max_num_transitions=max_num_transitions)
+        self.memory = Memory(max_num_transitions=max_num_transitions, mini_batch_size=32)
         self.device = device
 
     def load_model(self, model_path):
