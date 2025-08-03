@@ -93,13 +93,16 @@ while total_interactions < max_total_interactions:
         episode_total_loss += loss
         episode_total_reward += reward
 
-        # display logs every log_display_step
+        # display logs every log_display_step + saving
         if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
             avg_loss_of_last_episodes = np.average(history_of_total_losses[-num_of_last_episodes_to_avg:])
             avg_reward_of_last_episodes = np.average(history_of_total_rewards[-num_of_last_episodes_to_avg:])
             print(f'Displaying Logs at the Frame {total_interactions} and Episode {episode_cnt}:')
             print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
+
+            agent.save_model(f'/saved_models/agent_{game_id}_it_{total_interactions}.pt')
+
 
     # logging (accumulated over all episodes)
     history_of_total_losses.append(episode_total_loss)
