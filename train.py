@@ -48,8 +48,9 @@ wrapped_env = atari_image_wrapper # set to the last applied wrapper for more con
 print(f'The Environment for the Game {game_id} has been Initialized.')
 
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # configuration of the agent
-agent = Agent() # we keep the arguments as default
+agent = Agent(device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
@@ -71,13 +72,13 @@ while total_interactions < max_total_interactions:
 
     # initializing a new episode
     obs, info = wrapped_env.reset()
-    obs = torch.tensor(obs)
+    obs = torch.tensor(obs).to(device)
 
     while not episode_finished:
         # chosing action - observing the outcome - storing in replay buffer - learning 
         action = agent.choose_action(obs.unsqueeze(0))
         next_obs, reward, terminated, truncated, info = wrapped_env.step(action)
-        next_obs, action = torch.tensor(next_obs), torch.tensor(action)
+        next_obs, action = torch.tensor(next_obs).to(device), torch.tensor(action).to(device)
         
         agent.store_transition(obs, action, reward, terminated or truncated, next_obs)
         loss = agent.learn()
