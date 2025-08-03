@@ -11,15 +11,15 @@ class DQNNet(nn.Module):
 
         # in: (4, 84, 84) - out: (32, 20, 20)
         # reLU should be applied on the outputs
-        self.conv1 = nn.Conv2d(inchannels=4, out_channels=32, kernel_size= (8, 8), stride=4) 
+        self.conv1 = nn.Conv2d(in_channels=4, out_channels=32, kernel_size= (8, 8), stride=4) 
 
         # in: (32, 20, 20) - out: (64, 9, 9)
         # reLU should be applied on the outputs
-        self.conv2 = nn.Conv2d(inchannels=32, out_channels=64, kernel_size= (4, 4), stride=2)
+        self.conv2 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size= (4, 4), stride=2)
 
         # in: (64, 9, 9) - out: (64, 7, 7)
         # reLU should be applied on the outputs
-        self.conv3 = nn.Conv2d(inchannels=64, out_channels=64, kernel_size= (3, 3), stride=1)
+        self.conv3 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size= (3, 3), stride=1)
 
         # flattening should be applied here before feeding into fc1
 
