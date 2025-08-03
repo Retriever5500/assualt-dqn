@@ -77,4 +77,4 @@ class ClipReward(gym.Wrapper):
         obs, reward, terminated, truncated, info = self.env.step(action)
         reward = float(np.clip(reward, self.min_reward, self.max_reward))
 
-        return observation, reward, terminated, truncated, info
+        return obs, reward, terminated, truncated, info
