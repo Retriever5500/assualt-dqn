@@ -50,7 +50,7 @@ print(f'The Environment for the Game {game_id} has been Initialized.')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # configuration of the agent
-agent = Agent(device=device) # we keep the arguments as default
+agent = Agent( num_of_actions=4, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
@@ -102,7 +102,7 @@ while total_interactions < max_total_interactions:
             print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
 
-            agent.save_model(f'saved_models/agent_{game_id}_it_{total_interactions}.pt')
+            agent.save_model(f'saved_models/agent_it_{total_interactions}.pt')
 
 
     # logging (accumulated over all episodes)
