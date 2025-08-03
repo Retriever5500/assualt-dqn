@@ -27,5 +27,5 @@ class Memory:
         samples = (self.lst[idx] for idx in idxs)
         
         # changed the name to mini_batch in order to make the namings for similar to the workflow we use
-        mini_batch = tuple(map(torch.tensor, zip(samples)))
+        mini_batch = tuple(map(torch.tensor, zip(*samples)))
         return mini_batch
