@@ -5,13 +5,13 @@ import torch
 import torch.optim as optim
 import torch.nn.functional as F
 import numpy as np
-
-from network import DQNNet
-from memory import Memory
 import copy
 
+from model import DQNNet
+from memory import Memory
+
 class Agent:
-    def __init__(self, num_of_actions=4, network=None, lr=0.00025, gamma=0.99, eps=1.0,
+    def __init__(self, num_of_actions=7, network=None, lr=0.00025, gamma=0.99, eps=1.0,
         eps_fframe=1e6, eps_final=0.1, minibatch_size=32, min_training_step=1000,
         max_num_transitions=50000, target_interval=10000, device="cpu"):   
 
