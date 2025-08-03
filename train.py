@@ -35,7 +35,7 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
 
 
 # cofiguration of the environment
-game_id = 'ALE/Assault-v5'
+game_id = 'ALE/Breakout-v5'
 max_total_interactions = 5000000
 frame_skip = 4
 env = gym.make(id=game_id)
@@ -102,7 +102,7 @@ while total_interactions < max_total_interactions:
             print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
 
-            agent.save_model(f'/saved_models/agent_{game_id}_it_{total_interactions}.pt')
+            agent.save_model(f'saved_models/agent_{game_id}_it_{total_interactions}.pt')
 
 
     # logging (accumulated over all episodes)
