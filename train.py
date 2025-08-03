@@ -74,8 +74,8 @@ while total_interactions < max_total_interactions:
     obs = torch.tensor(obs)
 
     while not episode_finished:
-        # chosing action - observing the outcome - storing in replay buffer - learning    
-        action = agent.choose_action(obs)
+        # chosing action - observing the outcome - storing in replay buffer - learning 
+        action = agent.choose_action(obs.unsqueeze(0))
         next_obs, reward, terminated, truncated, info = wrapped_env.step(action)
         next_obs, action = torch.tensor(next_obs), torch.tensor(action)
         
