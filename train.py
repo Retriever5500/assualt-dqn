@@ -60,8 +60,8 @@ total_interactions = 0 # total number of the interactions, that the agent had so
 history_of_total_losses = []
 history_of_total_rewards = []
 episode_cnt = 0
-num_of_last_episodes_to_avg = 1000
-log_display_step = 100000
+num_of_last_episodes_to_avg = 100
+log_display_step = 10000
 
 print(f'Starting the Training...')
 while total_interactions < max_total_interactions: 
