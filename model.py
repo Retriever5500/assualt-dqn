@@ -32,17 +32,17 @@ class DQNNet(nn.Module):
 
     def forward(self, x):
         x = self.conv1(x)
-        x = nn.ReLU(x)
+        x = nn.ReLU()(x)
          
         x = self.conv2(x)
-        x = nn.ReLU(x)
+        x = nn.ReLU()(x)
          
         x = self.conv3(x)
-        x = nn.ReLU(x)
+        x = nn.ReLU()(x)
 
-        x = nn.Flatten(start_dim=1, end_dim=-1)
+        x = nn.Flatten(start_dim=1, end_dim=-1)(x)
 
         x = self.fc1(x)
-        x = nn.ReLU(x)
+        x = nn.ReLU()(x)
 
         return self.fc2(x)
