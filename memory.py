@@ -8,7 +8,7 @@ class Memory:
         self.mini_batch_size = mini_batch_size
 
     # this function returns the number of stored transitions
-    def get_num_of_curr_transitions(self):
+    def size(self):
         return len(self.lst)
     
     def append(self, curr_state, action, reward, next_state, done):
