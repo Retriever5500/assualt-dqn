@@ -59,7 +59,7 @@ class Agent:
         if(len(self.memory) < self.min_training_step):
             return
 
-        obss, actions, rewards, dones, next_obss = self.memory.sample(self.minibatch_size)
+        obss, actions, rewards, dones, next_obss = self.memory.sample_mini_batch()
 
         ys = rewards + 0.0
     
