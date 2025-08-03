@@ -23,9 +23,14 @@ class Memory:
             raise Exception('Don\'t try to sample mini-batches while number of stored transitions < mini_batch_size')
         
         idxs = np.random.randint(0, len(self.lst), self.mini_batch_size)
+        samples = [self.lst[idx] for idx in idxs]
+
+        zipped_content = tuple(zip(*samples))
+        dtypes = [torch.float32, torch.int, torch.bool, torch.float32, torch.float32]
+
+        mini_batch = [
+            torch.tensor(np.array(zipped_content[i]), dtype=dtypes[i])
+            for i in range(len(zipped_content))
+        ]
         
-        samples = (self.lst[idx] for idx in idxs)
-        
-        # changed the name to mini_batch in order to make the namings for similar to the workflow we use
-        mini_batch = tuple(map(lambda x: torch.tensor(np.array(x), dtype=torch.float32), zip(*samples)))
         return mini_batch

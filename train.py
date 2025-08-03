@@ -6,6 +6,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import torch
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward
@@ -70,11 +71,14 @@ while total_interactions < max_total_interactions:
 
     # initializing a new episode
     obs, info = wrapped_env.reset()
+    obs = torch.tensor(obs)
 
     while not episode_finished:
         # chosing action - observing the outcome - storing in replay buffer - learning    
         action = agent.choose_action(obs)
         next_obs, reward, terminated, truncated, info = wrapped_env.step(action)
+        next_obs, action = torch.tensor(next_obs), torch.tensor(action)
+        
         agent.store_transition(obs, action, reward, terminated or truncated, next_obs)
         loss = agent.learn()
         
