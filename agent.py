@@ -8,7 +8,7 @@ import numpy as np
 
 from network import DQNNet
 from memory import Memory
-
+import copy
 
 class Agent:
     def __init__(self, num_of_actions=4, network=None, lr=0.00025, gamma=0.99, eps=1.0,
