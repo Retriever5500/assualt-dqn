@@ -56,7 +56,7 @@ class Agent:
                 return torch.argmax(action_values).item()
 
     def learn(self):
-        if(self.memory.size < self.min_training_step):
+        if(len(self.memory) < self.min_training_step):
             return
 
         obss, actions, rewards, dones, next_obss = self.memory.sample(self.minibatch_size)
