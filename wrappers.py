@@ -55,10 +55,9 @@ class AtariImage(gym.Wrapper):
         return observation, total_reward, terminated, truncated, info
 
     def _process_observations(self, raw_obs, prev_raw_obs = None):
+        if prev_raw_obs is not None: # if there is any previous observation
+            raw_obs = np.fmax(raw_obs, prev_raw_obs) # element-wise max between the two images, over all pixel colour values
         image = Image.fromarray(raw_obs)
-        if prev_raw_obs != None: # if there is any previous observation
-            prev_image = Image.fromarray(prev_raw_obs)
-            image = np.fmax(image, prev_image) # element-wise max between the two images, over all pixel colour values
         image = image.convert('L')
         image = image.resize((self.image_shape[1], self.image_shape[0]))
         image_array = np.array(image).astype(np.float32)
