@@ -25,13 +25,14 @@ class AtariImage(gym.Wrapper):
     def reset(self):
         observations = []
 
-        obs, info = self.env.reset()
-        obs = self._process_observations(obs)
+        raw_obs, info = self.env.reset()
+        obs = self._process_observations(raw_obs)
         observations.append(obs)
 
         for i in range(self.frame_skip - 1):
-            obs, reward, terminated, truncated, info = self.env.step(0) # Do nothing
-            obs = self._process_observations(obs)
+            prev_raw_obs = raw_obs
+            raw_obs, reward, terminated, truncated, info = self.env.step(0) # Do nothing
+            obs = self._process_observations(raw_obs, prev_raw_obs)
             observations.append(obs)
 
         observation = np.stack(observations)
@@ -41,18 +42,22 @@ class AtariImage(gym.Wrapper):
     def step(self, action):
         observations = []
         total_reward = 0
+        prev_raw_obs = None
         for i in range(self.frame_skip):
-            obs, reward, terminated, truncated, info = self.env.step(action)
-            obs = self._process_observations(obs)
+            raw_obs, reward, terminated, truncated, info = self.env.step(action)
+            obs = self._process_observations(raw_obs, prev_raw_obs)
             observations.append(obs)
             total_reward += reward
+            prev_raw_obs = raw_obs
 
         observation = np.stack(observations)
 
         return observation, total_reward, terminated, truncated, info
 
-    def _process_observations(self, obs):
-        image = Image.fromarray(obs)
+    def _process_observations(self, raw_obs, prev_raw_obs = None):
+        if prev_raw_obs is not None: # if there is any previous observation
+            raw_obs = np.fmax(raw_obs, prev_raw_obs) # element-wise max between the two images, over all pixel colour values
+        image = Image.fromarray(raw_obs)
         image = image.convert('L')
         image = image.resize((self.image_shape[1], self.image_shape[0]))
         image_array = np.array(image).astype(np.float32)
