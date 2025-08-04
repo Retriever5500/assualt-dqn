@@ -38,7 +38,7 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
 game_id = 'ALE/Breakout-v5'
 max_total_interactions = 5000000
 frame_skip = 4
-env = gym.make(id=game_id)
+env = gym.make(id=game_id, **{'frameskip':1})
 clip_reward_wrapper = ClipReward(env)
 atari_image_wrapper = AtariImage(clip_reward_wrapper)
 # add other wrappers if needed
