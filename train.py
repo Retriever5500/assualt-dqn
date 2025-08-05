@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
+import os
+import time
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward
@@ -34,6 +36,13 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
     plt.tight_layout()
     plt.show()
 
+checkpoints_dir_path = "saved_models/"
+
+if not os.path.exists(checkpoints_dir_path):
+    os.makedirs(checkpoints_dir_path)
+    print(f"Directory '{checkpoints_dir_path}' created.")
+else:
+    print(f"Directory '{checkpoints_dir_path}' already exists.")
 
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
@@ -64,7 +73,7 @@ history_of_total_rewards = []
 episode_cnt = 0
 num_of_last_episodes_to_avg = 100
 log_display_step = 10000
-eval_cycle = 50000
+start_time = time.time()
 
 print(f'Starting the Training...')
 while total_interactions < max_total_interactions: 
@@ -98,16 +107,16 @@ while total_interactions < max_total_interactions:
 
         # display logs every log_display_step + saving
         if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
+            end_time = time.time()
             avg_loss_of_last_episodes = np.average(history_of_total_losses[-num_of_last_episodes_to_avg:])
             avg_reward_of_last_episodes = np.average(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Displaying Logs at the Frame {total_interactions} and Episode {episode_cnt}:')
+            print(f'Displaying Logs at the Frame {total_interactions}, Episode {episode_cnt}, Delta Time: {end_time - start_time}')
             print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
+            start_time = end_time
+            
+            agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
-            agent.save_model(f'saved_models/agent_it_{total_interactions}.pt')
-
-        if (total_interactions % eval_cycle and total_interactions > 0) == 0:
-            evaluate(wrapped_env, agent, device)
 
     # logging (accumulated over all episodes)
     history_of_total_losses.append(episode_total_loss)
@@ -117,7 +126,7 @@ while total_interactions < max_total_interactions:
 print(f'Training has been Finished!')
 
 print(f'Storing the Model...')
-agent.save_model(f'/saved_models/agent_{game_id}.pt')
+agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace('/', '-')}.pt')
 
 print(f'Plotting the Logs...')
 plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)
