@@ -10,6 +10,7 @@ import torch
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward
+from eval import evaluate
 
 def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards):
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
@@ -63,6 +64,7 @@ history_of_total_rewards = []
 episode_cnt = 0
 num_of_last_episodes_to_avg = 100
 log_display_step = 10000
+eval_cycle = 50000
 
 print(f'Starting the Training...')
 while total_interactions < max_total_interactions: 
@@ -104,6 +106,8 @@ while total_interactions < max_total_interactions:
 
             agent.save_model(f'saved_models/agent_it_{total_interactions}.pt')
 
+        if (total_interactions % eval_cycle and total_interactions > 0) == 0:
+            evaluate(wrapped_env, agent, device)
 
     # logging (accumulated over all episodes)
     history_of_total_losses.append(episode_total_loss)
