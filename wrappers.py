@@ -97,18 +97,19 @@ class NoopResetEnv(gym.Wrapper):
 
     def reset(self):
         obs, info = self.env.reset()
+        done = False
         while True:
+            successful = True
             num_of_rand_initial_frames = np.random.randint(1, self.max_num_initial_noop_frames + 1)
-            cnt = 0
-            while cnt < num_of_rand_initial_frames:
+            for i in range(num_of_rand_initial_frames):
                 obs, reward, terminated, truncated, info = self.env.step(0) # no-op
                 if terminated or truncated:
                     obs, info = self.env.reset()
+                    successful = False
                     break
-                cnt += 1
-
-            if cnt == num_of_rand_initial_frames:
-                return obs, info
+                if successful:
+                    return obs, info
+            
 
 class FireResetEnv(gym.Wrapper):
     """
