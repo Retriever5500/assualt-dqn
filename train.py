@@ -8,7 +8,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
 import os
-import time
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward
@@ -36,13 +35,15 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
     plt.tight_layout()
     plt.show()
 
-checkpoints_dir_path = "saved_models/"
+# automatic directory creation for checkpoints
+dir_path = "saved_models/"
 
-if not os.path.exists(checkpoints_dir_path):
-    os.makedirs(checkpoints_dir_path)
-    print(f"Directory '{checkpoints_dir_path}' created.")
+if not os.path.exists(dir_path):
+    os.makedirs(dir_path)
+    print(f"Directory '{dir_path}' created.")
 else:
-    print(f"Directory '{checkpoints_dir_path}' already exists.")
+    print(f"Directory '{dir_path}' already exists.")
+
 
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
@@ -126,7 +127,7 @@ while total_interactions < max_total_interactions:
 print(f'Training has been Finished!')
 
 print(f'Storing the Model...')
-agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace('/', '-')}.pt')
+agent.save_model(f'{dir_path}agent_{game_id.replace('/', '_')}.pt')
 
 print(f'Plotting the Logs...')
 plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)
