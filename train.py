@@ -10,7 +10,7 @@ import torch
 import os
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward
+from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv
 from eval import evaluate
 
 def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards):
@@ -50,11 +50,10 @@ game_id = 'ALE/Breakout-v5'
 max_total_interactions = 5000000
 frame_skip = 4
 env = gym.make(id=game_id, **{'frameskip':1})
-clip_reward_wrapper = ClipReward(env)
-atari_image_wrapper = AtariImage(clip_reward_wrapper)
-# add other wrappers if needed
-# ...
-wrapped_env = atari_image_wrapper # set to the last applied wrapper for more convinent naming 
+wrappers_lst = [ClipReward, NoopResetEnv, FireResetEnv, AtariImage]
+wrapped_env = env
+for wrapper in wrappers_lst:
+    wrapped_env = wrapper(wrapped_env)
 
 print(f'The Environment for the Game {game_id} has been Initialized.')
 
