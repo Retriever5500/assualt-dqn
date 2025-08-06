@@ -121,10 +121,14 @@ class FireResetEnv(gym.Wrapper):
         super().__init__(env)
 
     def reset(self, *, seed = None, options = None):
-        obs, info = self.env.reset(seed=seed, options=options)
-        obs, reward, terminated, truncated, info = self.env.step(1) # Fire
-        if terminated or truncated:
-            return self.env.reset(seed=seed, options=options)
+        successful_reset = False
+        while not successful_reset:
+            obs, info = self.env.reset(seed=seed, options=options)
+            obs, reward, terminated, truncated, info = self.env.step(1) # Fire
+            if terminated or truncated:
+                continue
+            else:
+                successful_reset = True
         return obs, info
     
 class EpisodicLifeEnv(gym.Wrapper):

@@ -34,8 +34,8 @@ checkpoints_dir_path = create_checkpoints_dir()
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
-env = gym.make(id=game_id, frameskip=1)
-wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
+env = gym.make(id=game_id, frameskip=1, render_mode='human')
+wrappers_lst = [ClipReward, EpisodicLifeEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -80,18 +80,15 @@ while total_interactions < max_total_interactions:
         
         agent.store_transition(obs, action, reward, terminated or truncated, next_obs)
         loss = agent.learn()
-        
-        if loss == None: # it means that the replay buffer has not stored a sufficient number of transitions yet
-            continue
 
         obs = next_obs
 
         # logging (accumlated over each episode)
         total_interactions += 1
         episode_finished = terminated or truncated
-        episode_total_loss += loss
+        episode_total_loss += loss if loss is not None else 0
         episode_total_reward += reward
-
+ 
         # display logs every log_display_step + saving
         if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
             end_time = time.time()
