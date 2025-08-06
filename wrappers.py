@@ -126,3 +126,24 @@ class FireResetEnv(gym.Wrapper):
         if terminated or truncated:
             return self.reset()
         return obs, info
+    
+class EpisodicLifeEnv(gym.Wrapper):
+    """
+    Gym wrapper to announce game over even if the agent losses a single life
+
+    :param env: Environment to wrap
+    """
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        obs, info = self.env.reset()
+        self.initial_lives = self.env.unwrapped.ale.lives()
+        return obs, info
+    
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        lives = self.env.unwrapped.ale.lives()
+        if lives < self.initial_lives:
+            terminated = True
+        return obs, reward, terminated, truncated, info
