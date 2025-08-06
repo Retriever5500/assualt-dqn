@@ -13,7 +13,7 @@ import time
 from agent import Agent
 from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv, BreakoutActionTransform
 from eval import evaluate
-from log import plot_logs
+from train_log import plot_logs
 
 def create_checkpoints_dir(dir_path='saved_models/'):
     if not os.path.exists(dir_path):
