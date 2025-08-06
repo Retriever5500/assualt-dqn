@@ -116,6 +116,8 @@ while total_interactions < max_total_interactions:
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
             start_time = end_time
             
+            print(f'Evaluation:')
+            evaluate(wrapped_env, agent, device)
             agent.save_model(f'{dir_path}agent_it_{total_interactions}.pt')
 
 
