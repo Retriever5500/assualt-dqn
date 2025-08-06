@@ -148,7 +148,7 @@ class EpisodicLifeEnv(gym.Wrapper):
             terminated = True
         return obs, reward, terminated, truncated, info
     
-class BreakoutActionTransform(gym.Wrapper):
+class BreakoutActionTransform(gym.ActionWrapper):
     """
     Gym wrapper to announce game over even if the agent losses a single life
 
