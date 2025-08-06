@@ -166,7 +166,6 @@ class BreakoutActionTransform(gym.Wrapper):
         return self.env.step(self.action(action))
 
     def action(self, action):
-        print(action)
         if action > 0:
             return action + 1
         return action
