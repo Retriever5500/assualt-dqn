@@ -147,3 +147,18 @@ class EpisodicLifeEnv(gym.Wrapper):
         if lives < self.initial_lives:
             terminated = True
         return obs, reward, terminated, truncated, info
+    
+class BreakoutActionTransform(gym.Wrapper):
+    """
+    Gym wrapper to announce game over even if the agent losses a single life
+
+    :param env: Environment to wrap
+    :
+    """
+    def __init__(self, env):
+        super().__init__(env)
+        self.action_space = gym.spaces.Discrete(n=3)
+
+    def action(self, action):
+        if action > 0:
+            return action + 1
