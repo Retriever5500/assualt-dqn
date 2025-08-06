@@ -157,17 +157,10 @@ class BreakoutActionTransform(gym.Wrapper):
     Gym wrapper to map the actions as follows {0->0(Noop), 1->2(Right), 2->3(Left)}
 
     :param env: Environment to wrap
-    :
     """
     def __init__(self, env):
         super().__init__(env)
         self.action_space = gym.spaces.Discrete(n=3)
-
-    def reset(self, *, seed = None, options = None):
-        return self.env.reset(seed=seed, options=options)
-
-    def step(self, action):
-        return self.env.step(self.action(action))
 
     def action(self, action):
         if action > 0:
