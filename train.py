@@ -11,7 +11,7 @@ import os
 import time
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv
+from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv, BreakoutActionTransform
 from eval import evaluate
 from log import plot_logs
 
@@ -35,7 +35,7 @@ checkpoints_dir_path = create_checkpoints_dir()
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
 env = gym.make(id=game_id, frameskip=1)
-wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage]
+wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
