@@ -46,7 +46,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # configuration of the agent
-agent = Agent(num_of_actions=4, device=device) # we keep the arguments as default
+agent = Agent(num_of_actions=3, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
