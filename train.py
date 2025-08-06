@@ -21,6 +21,7 @@ def create_checkpoints_dir(dir_path='saved_models/'):
         print(f"Directory '{dir_path}' created.")
     else:
         print(f"Directory '{dir_path}' already exists.")
+    return dir_path
 
 
 
