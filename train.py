@@ -13,58 +13,44 @@ import time
 from agent import Agent
 from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv
 from eval import evaluate
+from log import plot_logs
 
-def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards):
-    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-    axs = axs.flatten()
+def create_checkpoints_dir(dir_path='saved_models/'):
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+        print(f"Directory '{dir_path}' created.")
+    else:
+        print(f"Directory '{dir_path}' already exists.")
 
-    x = np.arange(1, episode_cnt + 1)
-    sns.lineplot(x=x, y=history_of_total_losses, ax=axs[0])
-    axs[0].set_title('Total Loss over Different Episodes')
-    axs[0].set_xlabel('Episodes')
-    axs[0].set_ylabel('Total MSE Loss')
-    # axs[0].legend()
 
-    sns.lineplot(x=x, y=history_of_total_rewards, ax=axs[1])
-    axs[1].set_title('Total Rewards over each Episodes')
-    axs[1].set_xlabel('Episodes')
-    axs[1].set_ylabel('Total Reward')
-    # axs[1].legend()
 
-    plt.suptitle('Total Loss & Reward over each Episodes \n ' )
 
-    plt.tight_layout()
-    plt.show()
 
-# automatic directory creation for checkpoints
-dir_path = "saved_models/"
 
-if not os.path.exists(dir_path):
-    os.makedirs(dir_path)
-    print(f"Directory '{dir_path}' created.")
-else:
-    print(f"Directory '{dir_path}' already exists.")
 
+# directory creation for checkpoints
+checkpoints_dir_path = create_checkpoints_dir()
 
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
-max_total_interactions = 5000000
 frame_skip = 4
-env = gym.make(id=game_id, **{'frameskip':1})
+env = gym.make(id=game_id, frameskip=1)
 wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
-
 print(f'The Environment for the Game {game_id} has been Initialized.')
 
-
+# configuration of the device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
 # configuration of the agent
 agent = Agent(num_of_actions=4, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
+max_total_interactions = 5000000
 total_interactions = 0 # total number of the interactions, that the agent had so far (each stack of the frames is counted once).
 
 
@@ -118,18 +104,17 @@ while total_interactions < max_total_interactions:
             
             print(f'Evaluation:')
             evaluate(wrapped_env, agent, device)
-            agent.save_model(f'{dir_path}agent_it_{total_interactions}.pt')
+            agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
 
     # logging (accumulated over all episodes)
     history_of_total_losses.append(episode_total_loss)
     history_of_total_rewards.append(episode_total_reward)
     episode_cnt += 1
-
 print(f'Training has been Finished!')
 
 print(f'Storing the Model...')
-agent.save_model(f'{dir_path}agent_{game_id.replace('/', '_')}.pt')
+agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace('/', '_')}.pt')
 
 print(f'Plotting the Logs...')
 plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)
