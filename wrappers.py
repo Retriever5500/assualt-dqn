@@ -97,7 +97,6 @@ class NoopResetEnv(gym.Wrapper):
 
     def reset(self, *, seed = None, options = None):
         obs, info = self.env.reset(seed=seed, options=options)
-        done = False
         while True:
             successful = True
             num_of_rand_initial_frames = np.random.randint(1, self.max_num_initial_noop_frames + 1)
@@ -107,8 +106,8 @@ class NoopResetEnv(gym.Wrapper):
                     obs, info = self.env.reset(seed=seed, options=options)
                     successful = False
                     break
-                if successful:
-                    return obs, info
+            if successful:
+                return obs, info
             
 
 class FireResetEnv(gym.Wrapper):

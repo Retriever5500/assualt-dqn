@@ -35,7 +35,7 @@ checkpoints_dir_path = create_checkpoints_dir()
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
 env = gym.make(id=game_id, frameskip=1, render_mode='human')
-wrappers_lst = [ClipReward, EpisodicLifeEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
+wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
