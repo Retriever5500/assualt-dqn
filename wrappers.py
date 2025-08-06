@@ -22,10 +22,10 @@ class AtariImage(gym.Wrapper):
         obs_shape = (frame_skip, self.image_shape[0], self.image_shape[1])
         self.observation_space = gym.spaces.Box(shape=obs_shape, low=0, high=1, dtype=np.float32)
 
-    def reset(self):
+    def reset(self, *, seed = None, options = None):
         observations = []
 
-        raw_obs, info = self.env.reset()
+        raw_obs, info = self.env.reset(seed=seed, options=options)
         obs = self._process_observations(raw_obs)
         observations.append(obs)
 
@@ -95,8 +95,8 @@ class NoopResetEnv(gym.Wrapper):
         super().__init__(env)
         self.max_num_initial_noop_frames = max_num_initial_noop_frames
 
-    def reset(self):
-        obs, info = self.env.reset()
+    def reset(self, *, seed = None, options = None):
+        obs, info = self.env.reset(seed=seed, options=options)
         done = False
         while True:
             successful = True
@@ -104,7 +104,7 @@ class NoopResetEnv(gym.Wrapper):
             for i in range(num_of_rand_initial_frames):
                 obs, reward, terminated, truncated, info = self.env.step(0) # no-op
                 if terminated or truncated:
-                    obs, info = self.env.reset()
+                    obs, info = self.env.reset(seed=seed, options=options)
                     successful = False
                     break
                 if successful:
@@ -120,11 +120,11 @@ class FireResetEnv(gym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
 
-    def reset(self):
-        obs, info = self.env.reset()
+    def reset(self, *, seed = None, options = None):
+        obs, info = self.env.reset(seed=seed, options=options)
         obs, reward, terminated, truncated, info = self.env.step(1) # Fire
         if terminated or truncated:
-            return self.reset()
+            return self.env.reset(seed=seed, options=options)
         return obs, info
     
 class EpisodicLifeEnv(gym.Wrapper):
@@ -136,8 +136,8 @@ class EpisodicLifeEnv(gym.Wrapper):
     def __init__(self, env):
         super().__init__(env)
 
-    def reset(self):
-        obs, info = self.env.reset()
+    def reset(self, *, seed = None, options = None):
+        obs, info = self.env.reset(seed=seed, options=options)
         self.initial_lives = self.env.unwrapped.ale.lives()
         return obs, info
     
@@ -150,7 +150,7 @@ class EpisodicLifeEnv(gym.Wrapper):
     
 class BreakoutActionTransform(gym.Wrapper):
     """
-    Gym wrapper to announce game over even if the agent losses a single life
+    Gym wrapper to map the actions as follows {0->0(Noop), 1->2(Right), 2->3(Left)}
 
     :param env: Environment to wrap
     :
@@ -159,8 +159,8 @@ class BreakoutActionTransform(gym.Wrapper):
         super().__init__(env)
         self.action_space = gym.spaces.Discrete(n=3)
 
-    def reset(self):
-        return self.env.reset()
+    def reset(self, *, seed = None, options = None):
+        return self.env.reset(seed=seed, options=options)
 
     def step(self, action):
         return self.env.step(self.action(action))
