@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import torch
 import os
+import time
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv
@@ -115,7 +116,7 @@ while total_interactions < max_total_interactions:
             print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
             start_time = end_time
             
-            agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
+            agent.save_model(f'{dir_path}agent_it_{total_interactions}.pt')
 
 
     # logging (accumulated over all episodes)
