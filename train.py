@@ -11,7 +11,7 @@ import os
 import time
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv
+from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv
 from eval import evaluate
 
 def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards):
@@ -51,7 +51,7 @@ game_id = 'ALE/Breakout-v5'
 max_total_interactions = 5000000
 frame_skip = 4
 env = gym.make(id=game_id, **{'frameskip':1})
-wrappers_lst = [ClipReward, NoopResetEnv, FireResetEnv, AtariImage]
+wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -61,7 +61,7 @@ print(f'The Environment for the Game {game_id} has been Initialized.')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # configuration of the agent
-agent = Agent( num_of_actions=4, device=device) # we keep the arguments as default
+agent = Agent(num_of_actions=4, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
