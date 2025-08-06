@@ -114,7 +114,7 @@ while total_interactions < max_total_interactions:
 print(f'Training has been Finished!')
 
 print(f'Storing the Model...')
-agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace('/', '_')}.pt')
+agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace("/", "_")}.pt')
 
 print(f'Plotting the Logs...')
 plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)
