@@ -83,3 +83,67 @@ class ClipReward(gym.Wrapper):
         reward = float(np.clip(reward, self.min_reward, self.max_reward))
 
         return obs, reward, terminated, truncated, info
+    
+class NoopResetEnv(gym.Wrapper):
+    """
+    Gym wrapper to do a random number of no-op after reset to add randomness to the play
+
+    :param env: Environment to wrap
+    :param max_num_initial_noop_frames: The maximum number of frames to do nothing
+    """
+    def __init__(self, env, max_num_initial_noop_frames=30):
+        super().__init__(env)
+        self.max_num_initial_noop_frames = max_num_initial_noop_frames
+
+    def reset(self):
+        obs, info = self.env.reset()
+        done = False
+        while True:
+            successful = True
+            num_of_rand_initial_frames = np.random.randint(1, self.max_num_initial_noop_frames + 1)
+            for i in range(num_of_rand_initial_frames):
+                obs, reward, terminated, truncated, info = self.env.step(0) # no-op
+                if terminated or truncated:
+                    obs, info = self.env.reset()
+                    successful = False
+                    break
+                if successful:
+                    return obs, info
+            
+
+class FireResetEnv(gym.Wrapper):
+    """
+    Gym wrapper to manually fire the ball for the game 'Breakout'
+
+    :param env: Environment to wrap
+    """
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        obs, info = self.env.reset()
+        obs, reward, terminated, truncated, info = self.env.step(1) # Fire
+        if terminated or truncated:
+            return self.reset()
+        return obs, info
+    
+class EpisodicLifeEnv(gym.Wrapper):
+    """
+    Gym wrapper to announce game over even if the agent losses a single life
+
+    :param env: Environment to wrap
+    """
+    def __init__(self, env):
+        super().__init__(env)
+
+    def reset(self):
+        obs, info = self.env.reset()
+        self.initial_lives = self.env.unwrapped.ale.lives()
+        return obs, info
+    
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        lives = self.env.unwrapped.ale.lives()
+        if lives < self.initial_lives:
+            terminated = True
+        return obs, reward, terminated, truncated, info
