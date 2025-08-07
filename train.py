@@ -36,7 +36,7 @@ checkpoints_dir_path = create_checkpoints_dir()
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
 env = gym.make(id=game_id, frameskip=1)
-wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
+wrappers_lst = [ClipReward, AtariImage]
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -47,7 +47,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # configuration of the agent
-agent = Agent(num_of_actions=3, device=device) # we keep the arguments as default
+agent = Agent(num_of_actions=wrapped_env.action_space.n, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
