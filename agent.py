@@ -19,11 +19,11 @@ class Agent:
         if(network == None):
             network = DQNNet(num_of_actions)
         self.network = network.to(device)
-        self.target_network = copy.deepcopy(network)
+        self.target_network = copy.deepcopy(self.network)
         self.target_interval = target_interval
         self.learn_count = 0
         # Hyperparameters taken from the paper
-        self.optim = torch.optim.RMSprop(network.parameters(), lr=lr, alpha=0.95, eps=0.01, momentum=0.95)
+        self.optim = torch.optim.RMSprop(self.network.parameters(), lr=lr, alpha=0.95, eps=0.01, momentum=0.95)
         self.minibatch_size = minibatch_size
 
         self.eps = eps
