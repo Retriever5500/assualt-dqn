@@ -23,7 +23,7 @@ class Agent:
         self.target_interval = target_interval
         self.learn_count = 0
         # Hyperparameters taken from the paper
-        self.optim = torch.optim.AdamW(self.network, lr=lr, amsgrad=True)
+        self.optim = torch.optim.AdamW(self.network.parameters(), lr=lr, amsgrad=True)
         self.minibatch_size = minibatch_size
 
         self.eps = eps
@@ -70,7 +70,7 @@ class Agent:
         qvals = self.network(obss)
         ys_p = qvals[torch.arange(qvals.size(0), device=self.device), actions]
 
-        loss = F.SmoothL1Loss(ys, ys_p)
+        loss = F.smooth_l1_loss(ys, ys_p)
 
         self.optim.zero_grad()
         loss.backward()
