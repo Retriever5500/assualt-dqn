@@ -7,12 +7,15 @@ from wrappers import AtariImage, ClipReward
 
 
 def test_model(model_path, env_name, total_games=3):
-    device = torch.device("cpu")
+    # configuration of the device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    env = gym.make(id=env_name, render_mode="human", **{'frameskip':1})
-    clip_reward_wrapper = ClipReward(env)
-    atari_image_wrapper = AtariImage(clip_reward_wrapper)
-    wrapped_env = atari_image_wrapper
+    env = gym.make(id=env_name, render_mode="human", frameskip=1)
+    wrappers_lst = [ClipReward, AtariImage] # Add other wrappers if it's used when we trained the agent
+    wrapped_env = env
+    for wrapper in wrappers_lst:
+        wrapped_env = wrapper(wrapped_env)
+    print(f'The Environment for the Game {game_id} has been Initialized.')
     num_of_actions = env.action_space.n
     agent = Agent(num_of_actions=num_of_actions, device=device)
     agent.load_model(model_path)
@@ -22,7 +25,7 @@ def test_model(model_path, env_name, total_games=3):
         done = False
 
         while not done:
-            action_index = agent.choose_action(torch.from_numpy(obs).unsqueeze(0), eps=0.05)
+            action_index = agent.choose_action(torch.from_numpy(obs).unsqueeze(0).to(device), eps=0.05)
             obs, reward, done, truncated, info = wrapped_env.step(action_index)
 
             if done:
