@@ -98,9 +98,9 @@ while total_interactions < max_total_interactions:
             end_time = time.time()
             avg_loss_of_last_episodes = np.average(history_of_total_losses[-num_of_last_episodes_to_avg:])
             avg_reward_of_last_episodes = np.average(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Displaying Logs at the Frame {total_interactions}, Episode {episode_cnt}, Delta Time: {end_time - start_time}')
-            print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
-            print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
+            print(f'Displaying training logs at the frame {total_interactions}, episode {episode_cnt}, delta time: {end_time - start_time:.3f}')
+            print(f'Mean loss across {num_of_last_episodes_to_avg} last episodes = {avg_loss_of_last_episodes:.4f}')
+            print(f'Mean reward across {num_of_last_episodes_to_avg} last episodes = {avg_reward_of_last_episodes:.4f}')
             start_time = end_time
             
             print(f'Evaluation:')

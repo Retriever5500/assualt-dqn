@@ -20,4 +20,4 @@ def evaluate(env, agent, device, games_count=10, num_of_lives_in_each_game=1, us
 
     mean_scores = sum(scores)/len(scores)
 
-    print(f"Mean score: {mean_scores:.1f}")
+    print(f"Mean score over {games_count * scaling_factor} episodes: {mean_scores:.4f}")
