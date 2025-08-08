@@ -37,8 +37,9 @@ game_id = 'ALE/Breakout-v5'
 frame_skip = 4
 num_of_lives_in_each_game = 5
 env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0)
-wrappers_lst = [FireResetWithoutEpisodicLife, ClipReward, AtariImage, BreakoutActionTransform]
+wrappers_lst = [EpisodicLifeEnv, FireResetWithEpisodicLife, ClipReward, AtariImage, BreakoutActionTransform]
 using_episodic_life = EpisodicLifeEnv in wrappers_lst
+scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -57,11 +58,11 @@ max_total_interactions = 5000000
 total_interactions = 0 # total number of the interactions, that the agent had so far (each stack of the frames is counted once).
 
 
-# logging variables (accumulated over all episodes)
+# logging variables
 history_of_total_losses = []
 history_of_total_rewards = []
 episode_cnt = 0
-num_of_last_episodes_to_avg = 100
+num_of_last_episodes_to_avg = 100 * scaling_factor
 log_display_step = 10000
 start_time = time.time()
 
@@ -86,7 +87,7 @@ while total_interactions < max_total_interactions:
 
         obs = next_obs
 
-        # logging (accumlated over each episode)
+        # logging
         total_interactions += 1
         episode_finished = terminated or truncated
         episode_total_loss += loss if loss is not None else 0
@@ -107,7 +108,7 @@ while total_interactions < max_total_interactions:
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
 
-    # logging (accumulated over all episodes)
+    # logging
     history_of_total_losses.append(episode_total_loss)
     history_of_total_rewards.append(episode_total_reward)
     episode_cnt += 1
