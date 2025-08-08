@@ -118,6 +118,7 @@ class FireResetEnv(gym.Wrapper):
     """
     def __init__(self, env):
         super().__init__(env)
+        self.lives = 0
 
     def reset(self, *, seed = None, options = None):
         while True:
@@ -125,7 +126,16 @@ class FireResetEnv(gym.Wrapper):
             obs, reward, terminated, truncated, info = self.env.step(1) # Fire
             if terminated or truncated:
                 continue
+            self.lives = self.env.unwrapped.ale.lives()
             return obs, info
+        
+    def step(self, action):
+        obs, reward, terminated, truncated, info = self.env.step(action)
+        lives = self.env.unwrapped.ale.lives()
+        if lives < self.lives:
+            obs, reward, terminated, truncated, info = self.env.step(1) # Fire when we lose a life as well
+            self.lives = lives
+        return obs, reward, terminated, truncated, info
     
 class EpisodicLifeEnv(gym.Wrapper[np.ndarray, int, np.ndarray, int]):
     # adapted from github.com/iewug/Atari-DQN
