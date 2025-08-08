@@ -120,15 +120,12 @@ class FireResetEnv(gym.Wrapper):
         super().__init__(env)
 
     def reset(self, *, seed = None, options = None):
-        successful_reset = False
-        while not successful_reset:
+        while True:
             obs, info = self.env.reset(seed=seed, options=options)
             obs, reward, terminated, truncated, info = self.env.step(1) # Fire
             if terminated or truncated:
                 continue
-            else:
-                successful_reset = True
-        return obs, info
+            return obs, info
     
 class EpisodicLifeEnv(gym.Wrapper[np.ndarray, int, np.ndarray, int]):
     # adapted from github.com/iewug/Atari-DQN
