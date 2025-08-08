@@ -11,7 +11,7 @@ import os
 import time
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv
+from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
 from eval import evaluate
 from train_log import plot_logs
 

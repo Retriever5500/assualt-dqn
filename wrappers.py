@@ -223,6 +223,9 @@ class BreakoutActionTransform(gym.Wrapper):
         super().__init__(env)
         self.action_space = gym.spaces.Discrete(n=3)
 
+    def step(self, action):
+        return self.env.step(self.action(action))
+
     def action(self, action):
         if action > 0:
             return action + 1
