@@ -11,7 +11,7 @@ import os
 import time
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward, NoopResetEnv, FireResetEnv, EpisodicLifeEnv, BreakoutActionTransform
+from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
 from eval import evaluate
 from train_log import plot_logs
 
@@ -35,8 +35,11 @@ checkpoints_dir_path = create_checkpoints_dir()
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
-env = gym.make(id=game_id, frameskip=1)
-wrappers_lst = [ClipReward, EpisodicLifeEnv, NoopResetEnv, FireResetEnv, AtariImage, BreakoutActionTransform]
+num_of_lives_in_each_game = 5
+env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0)
+wrappers_lst = [EpisodicLifeEnv, FireResetWithEpisodicLife, ClipReward, AtariImage, BreakoutActionTransform]
+using_episodic_life = EpisodicLifeEnv in wrappers_lst
+scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -47,7 +50,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # configuration of the agent
-agent = Agent(num_of_actions=3, device=device) # we keep the arguments as default
+agent = Agent(num_of_actions=wrapped_env.action_space.n, device=device) # we keep the arguments as default
 
 
 # parameters of the training loop 
@@ -55,11 +58,11 @@ max_total_interactions = 5000000
 total_interactions = 0 # total number of the interactions, that the agent had so far (each stack of the frames is counted once).
 
 
-# logging variables (accumulated over all episodes)
+# logging variables
 history_of_total_losses = []
 history_of_total_rewards = []
 episode_cnt = 0
-num_of_last_episodes_to_avg = 100
+num_of_last_episodes_to_avg = 100 * scaling_factor
 log_display_step = 10000
 start_time = time.time()
 
@@ -84,7 +87,7 @@ while total_interactions < max_total_interactions:
 
         obs = next_obs
 
-        # logging (accumlated over each episode)
+        # logging
         total_interactions += 1
         episode_finished = terminated or truncated
         episode_total_loss += loss if loss is not None else 0
@@ -95,17 +98,17 @@ while total_interactions < max_total_interactions:
             end_time = time.time()
             avg_loss_of_last_episodes = np.average(history_of_total_losses[-num_of_last_episodes_to_avg:])
             avg_reward_of_last_episodes = np.average(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Displaying Logs at the Frame {total_interactions}, Episode {episode_cnt}, Delta Time: {end_time - start_time}')
-            print(f'Avg Loss Across {num_of_last_episodes_to_avg} Last Episodes = {avg_loss_of_last_episodes:.4f}')
-            print(f'Avg Reward Across {num_of_last_episodes_to_avg} Last Episodes = {avg_reward_of_last_episodes:.4f}')
+            print(f'Displaying training logs at the frame {total_interactions}, episode {episode_cnt}, delta time: {end_time - start_time:.3f}')
+            print(f'Mean loss across {num_of_last_episodes_to_avg} last episodes = {avg_loss_of_last_episodes:.4f}')
+            print(f'Mean reward across {num_of_last_episodes_to_avg} last episodes = {avg_reward_of_last_episodes:.4f}')
             start_time = end_time
             
             print(f'Evaluation:')
-            evaluate(wrapped_env, agent, device)
+            evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
 
-    # logging (accumulated over all episodes)
+    # logging
     history_of_total_losses.append(episode_total_loss)
     history_of_total_rewards.append(episode_total_reward)
     episode_cnt += 1
