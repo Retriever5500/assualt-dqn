@@ -10,7 +10,7 @@ def test_model(model_path, env_name, total_games=3):
     # configuration of the device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    env = gym.make(id=env_name, render_mode="human", frameskip=1)
+    env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0)
     wrappers_lst = [ClipReward, AtariImage] # Add other wrappers if it's used when we trained the agent
     wrapped_env = env
     for wrapper in wrappers_lst:
