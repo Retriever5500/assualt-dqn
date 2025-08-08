@@ -43,12 +43,15 @@ class AtariImage(gym.Wrapper):
         observations = []
         total_reward = 0
         prev_raw_obs = None
+        prev_terminated = False
         for i in range(self.frame_skip):
             raw_obs, reward, terminated, truncated, info = self.env.step(action)
             obs = self._process_observations(raw_obs, prev_raw_obs)
             observations.append(obs)
+            terminated = terminated or prev_terminated
             total_reward += reward
             prev_raw_obs = raw_obs
+            prev_terminated = terminated # terminated gets set True once we lose a life, so we have to apply or operation over all of the stacked frames
 
         observation = np.stack(observations)
 
