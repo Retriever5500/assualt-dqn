@@ -113,9 +113,9 @@ class NoopResetEnv(gym.Wrapper):
                 return obs, info
             
 
-class FireResetEnv(gym.Wrapper):
+class FireResetWithoutEpisodicLife(gym.Wrapper):
     """
-    Gym wrapper to manually fire the ball for the game 'Breakout'
+    Gym wrapper (not to be used along with EpisodicLifeEnv) to manually fire the ball for the game 'Breakout'
 
     :param env: Environment to wrap
     """
@@ -139,6 +139,25 @@ class FireResetEnv(gym.Wrapper):
             obs, reward, terminated, truncated, info = self.env.step(1) # Fire when we lose a life as well
             self.lives = lives
         return obs, reward, terminated, truncated, info
+    
+class FireResetWithEpisodicLife(gym.Wrapper):
+    """
+    Gym wrapper (to be used along with EpisodicLifeEnv) to manually fire the ball for the game 'Breakout'
+
+    :param env: Environment to wrap
+    """
+    def __init__(self, env):
+        super().__init__(env)
+        self.lives = 0
+
+    def reset(self, *, seed = None, options = None):
+        while True:
+            obs, info = self.env.reset(seed=seed, options=options)
+            obs, reward, terminated, truncated, info = self.env.step(1) # Fire
+            if terminated or truncated:
+                continue
+            self.lives = self.env.unwrapped.ale.lives()
+            return obs, info
     
 class EpisodicLifeEnv(gym.Wrapper[np.ndarray, int, np.ndarray, int]):
     # adapted from github.com/iewug/Atari-DQN

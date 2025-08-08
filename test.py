@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import gymnasium as gym
 from agent import Agent
-from wrappers import AtariImage, ClipReward, FireResetEnv, EpisodicLifeEnv, NoopResetEnv
+from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv
 
 
 def test_model(model_path, env_name, total_games=3):
