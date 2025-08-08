@@ -35,8 +35,10 @@ checkpoints_dir_path = create_checkpoints_dir()
 # cofiguration of the environment
 game_id = 'ALE/Breakout-v5'
 frame_skip = 4
+num_of_lives_in_each_game = 5
 env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0)
 wrappers_lst = [FireResetWithoutEpisodicLife, ClipReward, AtariImage, BreakoutActionTransform]
+using_episodic_life = EpisodicLifeEnv in wrappers_lst
 wrapped_env = env
 for wrapper in wrappers_lst:
     wrapped_env = wrapper(wrapped_env)
@@ -101,7 +103,7 @@ while total_interactions < max_total_interactions:
             start_time = end_time
             
             print(f'Evaluation:')
-            evaluate(wrapped_env, agent, device)
+            evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
 
