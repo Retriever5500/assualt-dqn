@@ -3,7 +3,7 @@ import torch
 import numpy as np
 import gymnasium as gym
 from agent import Agent
-from wrappers import AtariImage, ClipReward
+from wrappers import AtariImage, ClipReward, FireResetEnv, EpisodicLifeEnv, NoopResetEnv
 
 
 def test_model(model_path, env_name, total_games=3):
@@ -16,7 +16,7 @@ def test_model(model_path, env_name, total_games=3):
     for wrapper in wrappers_lst:
         wrapped_env = wrapper(wrapped_env)
     print(f'The Environment for the Game {game_id} has been Initialized.')
-    num_of_actions = env.action_space.n
+    num_of_actions = wrapped_env.action_space.n
     agent = Agent(num_of_actions=num_of_actions, device=device)
     agent.load_model(model_path)
 
