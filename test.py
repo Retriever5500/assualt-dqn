@@ -46,4 +46,4 @@ if __name__ == "__main__":
     num_of_lives_in_each_game = args.num_of_lives
     using_episodic_life = args.using_episodic_life
 
-    test_model(model_path, game_id, total_games=3, num_of_lives_in_each_game=num_of_lives_in_each_game,)
+    test_model(model_path, game_id, 3, num_of_lives_in_each_game, using_episodic_life)
