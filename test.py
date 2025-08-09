@@ -2,8 +2,9 @@ import argparse
 import torch
 import numpy as np
 import gymnasium as gym
+from gymnasium.wrappers import TimeLimit
 from agent import Agent
-from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv
+from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
 
 
 def test_model(model_path, env_name, total_games=3, num_of_lives_in_each_game=1, using_episodic_life=False):
@@ -12,11 +13,17 @@ def test_model(model_path, env_name, total_games=3, num_of_lives_in_each_game=1,
     # configuration of the device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0, render_mode='human')
-    wrappers_lst = [FireResetWithoutEpisodicLife, ClipReward, AtariImage] # Add other wrappers if it's used when we trained the agent
+    num_of_lives_in_each_game = 5
+    env = gym.make(id=game_id, frameskip=1)
+    wrappers_lst = [(EpisodicLifeEnv, {}), 
+                    (FireResetWithEpisodicLife, {}), 
+                    (ClipReward, {}), 
+                    (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
+                    (BreakoutActionTransform, {}),
+                    (TimeLimit, {'max_episode_steps': 1000})] # each stack of frames is counted once
     wrapped_env = env
-    for wrapper in wrappers_lst:
-        wrapped_env = wrapper(wrapped_env)
+    for wrapper, kwargs in wrappers_lst:
+        wrapped_env = wrapper(wrapped_env, **kwargs)
     print(f'The Environment for the Game {game_id} has been Initialized.')
     num_of_actions = wrapped_env.action_space.n
     agent = Agent(num_of_actions=num_of_actions, device=device)
