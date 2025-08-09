@@ -19,7 +19,10 @@ class Agent:
         if(network == None):
             network = DQNNet(num_of_actions)
         self.network = network.to(device)
-        self.target_network = copy.deepcopy(self.network)
+        # Create a new instance of the network architecture on the device
+        self.target_network = DQNNet(num_of_actions).to(device)
+        # Load weights from self.network into target_network
+        self.target_network.load_state_dict(self.network.state_dict())
         self.target_interval = target_interval
         self.learn_count = 0
         # Hyperparameters taken from the paper
@@ -81,7 +84,7 @@ class Agent:
         self.learn_count += 1
 
         if(self.learn_count % self.target_interval == 0):
-            self.target_network = copy.deepcopy(self.network)
+            self.target_network.load_state_dict(self.network.state_dict())
             print("Updated target network")
 
         return loss.item()
