@@ -1,6 +1,7 @@
 import gymnasium as gym
 import ale_py
 gym.register_envs(ale_py) # register the Atari environments
+from gymnasium.wrappers import TimeLimit
 
 import random
 import numpy as np
@@ -34,15 +35,19 @@ checkpoints_dir_path = create_checkpoints_dir()
 
 # cofiguration of the environment
 game_id = 'BreakoutNoFrameskip-v4'
-frame_skip = 4
 num_of_lives_in_each_game = 5
 env = gym.make(id=game_id, frameskip=1, repeat_action_probability=0)
-wrappers_lst = [EpisodicLifeEnv, FireResetWithEpisodicLife, ClipReward, AtariImage, BreakoutActionTransform]
-using_episodic_life = EpisodicLifeEnv in wrappers_lst
+wrappers_lst = [(EpisodicLifeEnv, {}), 
+                (FireResetWithEpisodicLife, {}), 
+                (ClipReward, {}), 
+                (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
+                (BreakoutActionTransform, {}),
+                (TimeLimit, {'max_episode_steps': 1000})] # each stack of frames is counted once
+using_episodic_life = EpisodicLifeEnv in wrappers_lst[:][0]
 scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 wrapped_env = env
-for wrapper in wrappers_lst:
-    wrapped_env = wrapper(wrapped_env)
+for wrapper, kwargs in wrappers_lst:
+    wrapped_env = wrapper(wrapped_env, **kwargs)
 print(f'The Environment for the Game {game_id} has been Initialized.')
 
 # configuration of the device
