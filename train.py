@@ -44,7 +44,6 @@ wrappers_lst = [(EpisodicLifeEnv, {}),
                 (BreakoutActionTransform, {}),
                 (TimeLimit, {'max_episode_steps': 1000})] # each stack of frames is counted once
 using_episodic_life = EpisodicLifeEnv in wrappers_lst[:][0]
-scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 wrapped_env = env
 for wrapper, kwargs in wrappers_lst:
     wrapped_env = wrapper(wrapped_env, **kwargs)
@@ -67,6 +66,7 @@ total_interactions = 0 # total number of the interactions, that the agent had so
 history_of_total_losses = []
 history_of_total_rewards = []
 episode_cnt = 0
+scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 num_of_last_episodes_to_avg = 100 * scaling_factor
 log_display_step = 10000
 start_time = time.time()
