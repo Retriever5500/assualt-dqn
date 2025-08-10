@@ -20,7 +20,7 @@ def test_model(model_path, env_name, total_games=3, num_of_lives_in_each_game=1,
                     (ClipReward, {}), 
                     (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
                     (BreakoutActionTransform, {}),
-                    (TimeLimit, {'max_episode_steps': 1000})] # each stack of frames is counted once
+                    (TimeLimit, {'max_episode_steps': 10000})] # each stack of frames is counted once
     wrapped_env = env
     for wrapper, kwargs in wrappers_lst:
         wrapped_env = wrapper(wrapped_env, **kwargs)
