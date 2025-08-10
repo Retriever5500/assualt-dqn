@@ -20,7 +20,7 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
     axs[1].set_ylabel('Total Reward')
     # axs[1].legend()
 
-    plt.suptitle(f'Total Training Loss & Reward over each Episode, over {total_interactions} iterations \n {game_id}' )
+    plt.suptitle(f'Total Training Loss & Reward over each Episode, over {total_interactions} iterations and {episode_cnt} episodes \n {game_id}' )
 
     plt.tight_layout()
 
