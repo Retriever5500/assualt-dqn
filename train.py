@@ -16,14 +16,21 @@ from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireR
 from eval import evaluate
 from train_log import plot_logs
 
-def create_checkpoints_dir(dir_path='saved_models/'):
-    print(f'Creating directory for saving checkpoints...')
-    if not os.path.exists(dir_path):
-        os.makedirs(dir_path)
-        print(f"Directory '{dir_path}' created!")
+def create_proj_dirs(checkpoints_dir_path='saved_models/', plots_dir_path='plots/'):
+    print(f'Creating directory for saving checkpoints & plots...')
+    if not os.path.exists(checkpoints_dir_path):
+        os.makedirs(checkpoints_dir_path)
+        print(f"Directory '{checkpoints_dir_path}' created for saving checkpoints!")
     else:
-        print(f"Directory '{dir_path}' already exists!")
-    return dir_path
+        print(f"Directory '{checkpoints_dir_path}' already exists for saving checkpoints!")
+    
+    if not os.path.exists(plots_dir_path):
+        os.makedirs(plots_dir_path)
+        print(f"Directory '{plots_dir_path}' created for saving plots!")
+    else:
+        print(f"Directory '{plots_dir_path}' already exists for saving plots!")
+
+    return checkpoints_dir_path, plots_dir_path
 
 
 
@@ -32,7 +39,7 @@ def create_checkpoints_dir(dir_path='saved_models/'):
 
 
 # directory creation for checkpoints
-checkpoints_dir_path = create_checkpoints_dir()
+checkpoints_dir_path, plots_dir_path = create_proj_dirs()
 
 # cofiguration of the environment
 game_id = 'BreakoutNoFrameskip-v4'
@@ -42,7 +49,6 @@ wrappers_lst = [(EpisodicLifeEnv, {}),
                 (FireResetWithEpisodicLife, {}), 
                 (ClipReward, {}), 
                 (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
-                (BreakoutActionTransform, {}),
                 (TimeLimit, {'max_episode_steps': 1000})] # each stack of frames is counted once
 wrapped_env = env
 for wrapper, kwargs in wrappers_lst:
@@ -65,7 +71,7 @@ total_interactions = 0 # total number of the interactions, that the agent had so
 # logging variables
 history_of_total_losses = []
 history_of_total_rewards = []
-episode_cnt = 1
+episode_cnt = 0
 using_episodic_life = EpisodicLifeEnv in [t[0] for t in wrappers_lst]
 scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 num_of_last_episodes_to_avg = 100 * scaling_factor
@@ -108,20 +114,26 @@ while total_interactions < max_total_interactions:
             start_time = end_time
 
             # printing training logs
+            print(f'Training logs over the last {num_of_last_episodes_to_avg} episodes:')
             avg_loss_of_last_episodes = np.mean(history_of_total_losses[-num_of_last_episodes_to_avg:])
             avg_reward_of_last_episodes = np.mean(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Mean loss over {num_of_last_episodes_to_avg} last episodes = {avg_loss_of_last_episodes:.1f}')
-            print(f'Mean reward over {num_of_last_episodes_to_avg} last episodes = {avg_reward_of_last_episodes:.1f}')
+            std_loss_of_last_episodes = np.std(history_of_total_losses[-num_of_last_episodes_to_avg:])
+            std_reward_of_last_episodes = np.std(history_of_total_rewards[-num_of_last_episodes_to_avg:])
+            print(f'Loss: mean:{avg_loss_of_last_episodes:.1f}, std:{std_loss_of_last_episodes:.1f}')
+            print(f'Reward: mean:{avg_reward_of_last_episodes:.1f}, std:{std_reward_of_last_episodes:.1f}')
 
             # printing evaluation logs            
             eval_mean, eval_var = evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
 
-            # TODO - plotting training & evaluation logs and storing plots as images
+            # TODO - plotting training and storing plots as images
+            plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dir_path)
 
             # TODO - updating the best model according to mean evaluation scores and saving
 
             # saving the checkpoint
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
+
+            print('\n')
 
 
     # updating logs per episode

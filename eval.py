@@ -23,9 +23,7 @@ def evaluate(env, agent, device, games_count=10, num_of_lives_in_each_game=1, us
     mean_scores = np.mean(scores)
     std_scores = np.std(scores)
 
-    print(f"Evaluation scores: \
-          Mean: {mean_scores:.2f} \
-          Std: {std_scores:.2f}")
+    print(f"Evaluation scores: mean: {mean_scores:.2f}, std: {std_scores:.2f}")
     
     return mean_scores, std_scores
 
