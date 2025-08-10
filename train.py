@@ -156,4 +156,4 @@ print(f'Storing the model...')
 agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace("/", "_")}.pt')
 
 print(f'Plotting the final logs...')
-plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)
+plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dir_path)
