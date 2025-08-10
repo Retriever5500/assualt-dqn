@@ -17,11 +17,12 @@ from eval import evaluate
 from train_log import plot_logs
 
 def create_checkpoints_dir(dir_path='saved_models/'):
+    print(f'Creating directory for saving checkpoints...')
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
-        print(f"Directory '{dir_path}' created.")
+        print(f"Directory '{dir_path}' created!")
     else:
-        print(f"Directory '{dir_path}' already exists.")
+        print(f"Directory '{dir_path}' already exists!")
     return dir_path
 
 
@@ -46,7 +47,7 @@ wrappers_lst = [(EpisodicLifeEnv, {}),
 wrapped_env = env
 for wrapper, kwargs in wrappers_lst:
     wrapped_env = wrapper(wrapped_env, **kwargs)
-print(f'The Environment for the Game {game_id} has been Initialized.')
+print(f'The environment for the game {game_id} has been initialized!')
 
 # configuration of the device
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -64,14 +65,14 @@ total_interactions = 0 # total number of the interactions, that the agent had so
 # logging variables
 history_of_total_losses = []
 history_of_total_rewards = []
-episode_cnt = 0
+episode_cnt = 1
 using_episodic_life = EpisodicLifeEnv in [t[0] for t in wrappers_lst]
 scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 num_of_last_episodes_to_avg = 100 * scaling_factor
 log_display_step = 10000
 start_time = time.time()
 
-print(f'Starting the Training...')
+print(f'Starting the training...')
 while total_interactions < max_total_interactions: 
     episode_finished = False
     episode_total_loss = 0.0
@@ -82,45 +83,55 @@ while total_interactions < max_total_interactions:
     obs = torch.tensor(obs)
 
     while not episode_finished:
-        # chosing action - observing the outcome - storing in replay buffer - learning 
+        # chosing action - observing the outcome
         action = agent.choose_action(obs.unsqueeze(0).to(device))
         next_obs, reward, terminated, truncated, info = wrapped_env.step(action)
         next_obs, action = torch.tensor(next_obs), torch.tensor(action)
         
+        # storing in replay buffer - learning 
         agent.store_transition(obs, action, reward, terminated or truncated, next_obs)
         loss = agent.learn()
-
+        
+        # updating current last observation
         obs = next_obs
 
-        # logging
+        # updating logs per step in each episode
         total_interactions += 1
         episode_finished = terminated or truncated
         episode_total_loss += loss if loss is not None else 0
         episode_total_reward += reward
  
-        # display logs every log_display_step + saving
+
         if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
             end_time = time.time()
-            avg_loss_of_last_episodes = np.average(history_of_total_losses[-num_of_last_episodes_to_avg:])
-            avg_reward_of_last_episodes = np.average(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Displaying training logs at the frame {total_interactions}, episode {episode_cnt}, delta time: {end_time - start_time:.3f}')
-            print(f'Mean loss across {num_of_last_episodes_to_avg} last episodes = {avg_loss_of_last_episodes:.4f}')
-            print(f'Mean reward across {num_of_last_episodes_to_avg} last episodes = {avg_reward_of_last_episodes:.4f}')
+            print(f'<------- Displaying logs at the frame {total_interactions}, episode {episode_cnt}, delta time {end_time - start_time:.1f} ------->')
             start_time = end_time
-            
-            print(f'Evaluation:')
-            evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
+
+            # printing training logs
+            avg_loss_of_last_episodes = np.mean(history_of_total_losses[-num_of_last_episodes_to_avg:])
+            avg_reward_of_last_episodes = np.mean(history_of_total_rewards[-num_of_last_episodes_to_avg:])
+            print(f'Mean loss over {num_of_last_episodes_to_avg} last episodes = {avg_loss_of_last_episodes:.1f}')
+            print(f'Mean reward over {num_of_last_episodes_to_avg} last episodes = {avg_reward_of_last_episodes:.1f}')
+
+            # printing evaluation logs            
+            eval_mean, eval_var = evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
+
+            # TODO - plotting training & evaluation logs and storing plots as images
+
+            # TODO - updating the best model according to mean evaluation scores and saving
+
+            # saving the checkpoint
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
 
 
-    # logging
+    # updating logs per episode
     history_of_total_losses.append(episode_total_loss)
     history_of_total_rewards.append(episode_total_reward)
     episode_cnt += 1
-print(f'Training has been Finished!')
+print(f'Training has been finished!')
 
-print(f'Storing the Model...')
+print(f'Storing the model...')
 agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace("/", "_")}.pt')
 
-print(f'Plotting the Logs...')
+print(f'Plotting the final logs...')
 plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards)

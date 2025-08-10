@@ -24,7 +24,7 @@ def test_model(model_path, env_name, total_games=3, num_of_lives_in_each_game=1,
     wrapped_env = env
     for wrapper, kwargs in wrappers_lst:
         wrapped_env = wrapper(wrapped_env, **kwargs)
-    print(f'The Environment for the Game {game_id} has been Initialized.')
+    print(f'The environment for the game {game_id} has been initialized!')
     num_of_actions = wrapped_env.action_space.n
     agent = Agent(num_of_actions=num_of_actions, device=device)
     agent.load_model(model_path)

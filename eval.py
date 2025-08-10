@@ -1,10 +1,12 @@
 import torch
+import numpy as np
 
 
 def evaluate(env, agent, device, games_count=10, num_of_lives_in_each_game=1, using_episodic_life=False):
     scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
 
     scores = []
+    print(f'Starting evaluation for {games_count * scaling_factor} episodes:')
     for i in range(games_count * scaling_factor):
         obs, info = env.reset()
         done = False
@@ -18,6 +20,13 @@ def evaluate(env, agent, device, games_count=10, num_of_lives_in_each_game=1, us
 
         scores.append(total_reward)
 
-    mean_scores = sum(scores)/len(scores)
+    mean_scores = np.mean(scores)
+    std_scores = np.std(scores)
 
-    print(f"Mean score over {games_count * scaling_factor} episodes: {mean_scores:.4f}")
+    print(f"Evaluation scores: \
+          Mean: {mean_scores:.2f} \
+          Std: {std_scores:.2f}")
+    
+    return mean_scores, std_scores
+
+
