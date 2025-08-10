@@ -10,6 +10,7 @@ import seaborn as sns
 import torch
 import os
 import time
+import math
 
 from agent import Agent
 from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
@@ -66,6 +67,9 @@ agent = Agent(num_of_actions=wrapped_env.action_space.n, device=device) # we kee
 # parameters of the training loop 
 max_total_interactions = 5000000
 total_interactions = 0 # total number of the interactions, that the agent had so far (each stack of the frames is counted once).
+
+# variables to keep track of the best parameters based on evaluation scores
+best_eval_mean = - math.inf
 
 
 # logging variables
@@ -129,6 +133,10 @@ while total_interactions < max_total_interactions:
             plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dir_path)
 
             # TODO - updating the best model according to mean evaluation scores and saving
+            if eval_mean > best_eval_mean:
+                print(f"Changing best model: evaluation reward mean improved by {eval_mean - best_eval_mean:.4f}! (showing to 4 decimal places)")
+                best_eval_mean = eval_mean
+                agent.save_model(f'{checkpoints_dir_path}best_model_it_{total_interactions}.pt')
 
             # saving the checkpoint
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
