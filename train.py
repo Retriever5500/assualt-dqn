@@ -113,9 +113,7 @@ while total_interactions < max_total_interactions:
  
 
         if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
-            end_time = time.time()
-            print(f'<------- Displaying logs at the frame {total_interactions}, episode {episode_cnt}, delta time {end_time - start_time:.1f} ------->')
-            start_time = end_time
+            print(f'<------- Displaying logs at the frame {total_interactions}, episode {episode_cnt} ------->')
 
             # printing training logs
             print(f'Training logs over the last {num_of_last_episodes_to_avg} episodes:')
@@ -140,6 +138,10 @@ while total_interactions < max_total_interactions:
 
             # saving the checkpoint
             agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
+
+            end_time = time.time()
+            print(f"delta time {end_time - start_time:.1f}")
+            start_time = end_time
 
             print('\n')
 
