@@ -1,13 +1,16 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plot_dir_path):
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
     axs = axs.flatten()
-    print(total_interactions, episode_cnt, len(history_of_total_losses), len(history_of_total_rewards))
     x = np.arange(1, episode_cnt + 1)
-    print(len(x), len(history_of_total_losses))
+
     sns.lineplot(x=x, y=history_of_total_losses, ax=axs[0])
     axs[0].set_title('Total Training Loss over each Episode')
     axs[0].set_xlabel('Episodes')
