@@ -26,7 +26,7 @@ class Agent:
         self.target_interval = target_interval
         self.learn_count = 0
         # Hyperparameters taken from the paper
-        self.optim = torch.optim.RMSprop(self.network.parameters(), lr=lr, alpha=0.99, eps=1e-6, momentum=0.0)
+        self.optim = torch.optim.RMSprop(self.network.parameters(), lr=lr, alpha=0.95, eps=0.01, momentum=0.95)
         self.minibatch_size = minibatch_size
 
         self.eps = eps
