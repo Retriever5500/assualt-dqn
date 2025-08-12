@@ -73,7 +73,10 @@ class Agent:
         qvals = self.network(obss)
         ys_p = qvals[torch.arange(qvals.size(0), device=self.device), actions]
 
-        loss = F.mse_loss(ys, ys_p)
+        error = ys - ys_p
+        clipped_error = torch.clamp(error, -1.0, 1.0)
+
+        loss = F.mse_loss(clipped_error, torch.zeros_like(clipped_error))
 
         self.optim.zero_grad()
         loss.backward()
