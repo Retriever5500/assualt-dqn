@@ -2,6 +2,7 @@ import numpy as np
 import gymnasium as gym
 from PIL import Image
 from ale_py import ALEInterface
+from collections import deque
 
 
 class AtariImage(gym.Wrapper):
@@ -18,41 +19,30 @@ class AtariImage(gym.Wrapper):
         super().__init__(env)
         self.image_shape = image_shape
         self.stack_frames = stack_frames
-
+        self.stacked_frames = deque([], maxlen=stack_frames)
         obs_shape = (stack_frames, self.image_shape[0], self.image_shape[1])
         self.observation_space = gym.spaces.Box(shape=obs_shape, low=0, high=1, dtype=np.float32)
 
     def reset(self, *, seed = None, options = None):
-        observations = []
-
         raw_obs, info = self.env.reset(seed=seed, options=options)
         obs = self._process_observations(raw_obs)
-        observations.append(obs)
+        for i in range(self.stack_frames):
+            self.stacked_frames.append(obs)
 
-        for i in range(self.stack_frames - 1):
-            raw_obs, reward, terminated, truncated, info = self.env.step(0) # Do nothing
-            obs = self._process_observations(raw_obs)
-            observations.append(obs)
-
-        observation = np.stack(observations)
-
-        return observation, info
+        return np.array(self.stacked_frames), info
 
     def step(self, action):
-        observations = []
         total_reward = 0
         prev_terminated = False
         for i in range(self.stack_frames):
             raw_obs, reward, terminated, truncated, info = self.env.step(action)
             obs = self._process_observations(raw_obs)
-            observations.append(obs)
+            self.stacked_frames.append(obs)
             terminated = terminated or prev_terminated
             total_reward += reward
             prev_terminated = terminated # terminated gets set True once we lose a life, so we have to apply or operation over all of the stacked frames
 
-        observation = np.stack(observations)
-
-        return observation, total_reward, terminated, truncated, info
+        return np.array(self.stacked_frames), total_reward, terminated, truncated, info
 
     def _process_observations(self, raw_obs):
         image = Image.fromarray(raw_obs)
