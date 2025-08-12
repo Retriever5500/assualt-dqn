@@ -13,7 +13,7 @@ import time
 import math
 
 from agent import Agent
-from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
+from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform, MaxAndSkip
 from eval import evaluate
 from train_log import plot_logs
 
@@ -46,10 +46,11 @@ checkpoints_dir_path, plots_dir_path = create_proj_dirs()
 game_id = 'BreakoutNoFrameskip-v4'
 num_of_lives_in_each_game = 5
 env = gym.make(id=game_id, frameskip=1)
-wrappers_lst = [(EpisodicLifeEnv, {}), 
+wrappers_lst = [(MaxAndSkip, {'frameskip': 4}),
+                (EpisodicLifeEnv, {}), 
                 (FireResetWithEpisodicLife, {}), 
                 (ClipReward, {}), 
-                (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
+                (AtariImage, {'image_shape':(84, 84), 'stack_frames': 4}), 
                 (TimeLimit, {'max_episode_steps': 10000})] # each stack of frames is counted once
 wrapped_env = env
 for wrapper, kwargs in wrappers_lst:

@@ -14,12 +14,12 @@ class AtariImage(gym.Wrapper):
     :param image_shape: The output shape of the image
     :param frame_skip: The amount of frames that stack, also the same action is applied
     """
-    def __init__(self, env, image_shape=(84, 84), frame_skip=4):
+    def __init__(self, env, image_shape=(84, 84), stack_frames=4):
         super().__init__(env)
         self.image_shape = image_shape
-        self.frame_skip = frame_skip
+        self.stack_frames = stack_frames
 
-        obs_shape = (frame_skip, self.image_shape[0], self.image_shape[1])
+        obs_shape = (stack_frames, self.image_shape[0], self.image_shape[1])
         self.observation_space = gym.spaces.Box(shape=obs_shape, low=0, high=1, dtype=np.float32)
 
     def reset(self, *, seed = None, options = None):
@@ -29,10 +29,9 @@ class AtariImage(gym.Wrapper):
         obs = self._process_observations(raw_obs)
         observations.append(obs)
 
-        for i in range(self.frame_skip - 1):
-            prev_raw_obs = raw_obs
+        for i in range(self.stack_frames - 1):
             raw_obs, reward, terminated, truncated, info = self.env.step(0) # Do nothing
-            obs = self._process_observations(raw_obs, prev_raw_obs)
+            obs = self._process_observations(raw_obs)
             observations.append(obs)
 
         observation = np.stack(observations)
@@ -42,24 +41,20 @@ class AtariImage(gym.Wrapper):
     def step(self, action):
         observations = []
         total_reward = 0
-        prev_raw_obs = None
         prev_terminated = False
-        for i in range(self.frame_skip):
+        for i in range(self.stack_frames):
             raw_obs, reward, terminated, truncated, info = self.env.step(action)
-            obs = self._process_observations(raw_obs, prev_raw_obs)
+            obs = self._process_observations(raw_obs)
             observations.append(obs)
             terminated = terminated or prev_terminated
             total_reward += reward
-            prev_raw_obs = raw_obs
             prev_terminated = terminated # terminated gets set True once we lose a life, so we have to apply or operation over all of the stacked frames
 
         observation = np.stack(observations)
 
         return observation, total_reward, terminated, truncated, info
 
-    def _process_observations(self, raw_obs, prev_raw_obs = None):
-        if prev_raw_obs is not None: # if there is any previous observation
-            raw_obs = np.fmax(raw_obs, prev_raw_obs) # element-wise max between the two images, over all pixel colour values
+    def _process_observations(self, raw_obs):
         image = Image.fromarray(raw_obs)
         image = image.convert('L')
         image = image.resize((self.image_shape[1], self.image_shape[0]))
@@ -67,6 +62,39 @@ class AtariImage(gym.Wrapper):
         image_array /= 255
         return image_array
 
+class MaxAndSkip(gym.Wrapper):
+    """
+    Gym wrapper to skip frames by a step of k (frame skipping get applied before AtariImage and it's frame stacking. e.g. the frames in a stack can be 0, k, 2k, etc.) and taking the max
+    between the two last frames.
+    
+    :param env: Environment to wrap
+    :param frameskip: frames to skip
+    """
+
+    def __init__(self, env, frameskip=4):
+        super().__init__(env)
+        assert frameskip >= 2
+        self.frameskip = frameskip
+        self.obs_buffer = np.zeros(shape=(2, ) + self.observation_space.shape, dtype='uint8')
+
+    def step(self, action):
+        total_reward = 0
+        done = False
+        for i in range(self.frameskip):    
+            obs, reward, termianted, truncated, info = self.env.step(action) # do nothing
+            
+            if (self.frameskip - i == 2): self.obs_buffer[0] = obs # storing the one to last frame
+            elif (self.frameskip - i == 1): self.obs_buffer[1] = obs # storing the last frame
+            
+            total_reward += reward
+            done = termianted or truncated
+            
+            if done: 
+                break
+            
+        max_frame = np.fmax(self.obs_buffer[0], self.obs_buffer[1])
+        
+        return max_frame, total_reward, done, done, info
 
 class ClipReward(gym.Wrapper):
     """
