@@ -45,7 +45,7 @@ checkpoints_dir_path, plots_dir_path = create_proj_dirs()
 # cofiguration of the environment
 game_id = 'BreakoutNoFrameskip-v4'
 num_of_lives_in_each_game = 5
-env = gym.make(id=game_id, frameskip=1)
+env = gym.make(id=game_id)
 wrappers_lst = [(MaxAndSkip, {'frameskip': 4}),
                 (EpisodicLifeEnv, {}), 
                 (FireResetWithEpisodicLife, {}), 
