@@ -77,6 +77,7 @@ class Agent:
 
         self.optim.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(self.network.parameters(), max_norm=1.0)
         self.optim.step()
 
         self.eps = max(self.eps - self.eps_step, self.eps_final)
