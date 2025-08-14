@@ -77,8 +77,7 @@ history_of_total_losses = []
 history_of_total_rewards = []
 episode_cnt = 0
 using_episodic_life = EpisodicLifeEnv in [t[0] for t in wrappers_lst]
-scaling_factor = num_of_lives_in_each_game if using_episodic_life else 1
-num_of_last_episodes_to_avg = 100 * scaling_factor
+num_of_last_episodes_to_avg = 100
 log_display_step = 10000
 start_time = time.time()
 
