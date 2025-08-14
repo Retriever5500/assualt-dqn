@@ -16,34 +16,17 @@ from agent import Agent
 from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
 from eval import evaluate
 from train_log import plot_logs
-
-def create_proj_dirs(checkpoints_dir_path='saved_models/', plots_dir_path='plots/'):
-    print(f'Creating directory for saving checkpoints & plots...')
-    if not os.path.exists(checkpoints_dir_path):
-        os.makedirs(checkpoints_dir_path)
-        print(f"Directory '{checkpoints_dir_path}' created for saving checkpoints!")
-    else:
-        print(f"Directory '{checkpoints_dir_path}' already exists for saving checkpoints!")
-    
-    if not os.path.exists(plots_dir_path):
-        os.makedirs(plots_dir_path)
-        print(f"Directory '{plots_dir_path}' created for saving plots!")
-    else:
-        print(f"Directory '{plots_dir_path}' already exists for saving plots!")
-
-    return checkpoints_dir_path, plots_dir_path
+from init_dirs import create_proj_dirs
 
 
 
 
+game_id = 'BreakoutNoFrameskip-v4'
 
-
-
-# directory creation for checkpoints
-checkpoints_dir_path, plots_dir_path = create_proj_dirs()
+# directory creation for the project
+plots_dirname, training_checkpoints_dirname, best_checkpoints_dirname = create_proj_dirs(game_id)
 
 # cofiguration of the environment
-game_id = 'BreakoutNoFrameskip-v4'
 num_of_lives_in_each_game = 5
 env = gym.make(id=game_id, frameskip=1)
 wrappers_lst = [(EpisodicLifeEnv, {}), 
@@ -126,17 +109,17 @@ while total_interactions < max_total_interactions:
             # printing evaluation logs            
             eval_mean, eval_var = evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
 
-            # TODO - plotting training and storing plots as images
-            plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dir_path)
+            # plotting training and storing plots as images
+            plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dirname)
 
-            # TODO - updating the best model according to mean evaluation scores and saving
+            # updating the best model according to mean evaluation scores and saving
             if eval_mean > best_eval_mean:
                 print(f"Changing best model: evaluation mean reward improved by {eval_mean - best_eval_mean:.4f}!")
                 best_eval_mean = eval_mean
-                agent.save_model(f'{checkpoints_dir_path}best_model_it_{total_interactions}.pt')
+                agent.save_model(f'{best_checkpoints_dirname}best_model_it_{total_interactions}_mean_reward_{best_eval_mean:.4f}.pt')
 
             # saving the checkpoint
-            agent.save_model(f'{checkpoints_dir_path}agent_it_{total_interactions}.pt')
+            agent.save_model(f'{training_checkpoints_dirname}agent_it_{total_interactions}.pt')
 
             end_time = time.time()
             print(f"delta time {end_time - start_time:.1f}")
@@ -152,7 +135,7 @@ while total_interactions < max_total_interactions:
 print(f'Training has been finished!')
 
 print(f'Storing the model...')
-agent.save_model(f'{checkpoints_dir_path}agent_{game_id.replace("/", "_")}.pt')
+agent.save_model(f'{training_checkpoints_dirname}agent.pt')
 
 print(f'Plotting the final logs...')
-plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dir_path)
+plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses, history_of_total_rewards, plots_dirname)
