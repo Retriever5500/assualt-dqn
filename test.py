@@ -1,6 +1,5 @@
 import argparse
 import torch
-import numpy as np
 import gymnasium as gym
 from gymnasium.wrappers import TimeLimit
 from agent import Agent

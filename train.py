@@ -3,12 +3,8 @@ import ale_py
 gym.register_envs(ale_py) # register the Atari environments
 from gymnasium.wrappers import TimeLimit
 
-import random
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 import torch
-import os
 import time
 import math
 
