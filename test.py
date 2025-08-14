@@ -1,6 +1,8 @@
 import argparse
 import torch
 import gymnasium as gym
+import ale_py
+gym.register_envs(ale_py) # register the Atari environments
 from gymnasium.wrappers import TimeLimit
 from agent import Agent
 from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
