@@ -111,7 +111,7 @@ while total_interactions < max_total_interactions:
         episode_total_reward += reward
  
 
-        if (total_interactions % log_display_step) == 0 and (total_interactions > 0) and (episode_cnt >= num_of_last_episodes_to_avg):
+        if (total_interactions % log_display_step) == 0 and (episode_cnt >= num_of_last_episodes_to_avg):
             print(f'<------- Displaying logs at the frame {total_interactions}, episode {episode_cnt} ------->')
 
             # printing training logs
