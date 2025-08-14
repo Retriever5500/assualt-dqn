@@ -112,7 +112,7 @@ while total_interactions < max_total_interactions:
  
 
         if (total_interactions % log_display_step) == 0 and (episode_cnt >= num_of_last_episodes_to_avg):
-            print(f'<------- Displaying logs at the frame {total_interactions}, episode {episode_cnt} ------->')
+            print(f'<------- Displaying logs at the iteration {total_interactions}, episode {episode_cnt} ------->')
 
             # printing training logs
             print(f'Training logs over the last {num_of_last_episodes_to_avg} episodes:')
@@ -120,8 +120,8 @@ while total_interactions < max_total_interactions:
             avg_reward_of_last_episodes = np.mean(history_of_total_rewards[-num_of_last_episodes_to_avg:])
             std_loss_of_last_episodes = np.std(history_of_total_losses[-num_of_last_episodes_to_avg:])
             std_reward_of_last_episodes = np.std(history_of_total_rewards[-num_of_last_episodes_to_avg:])
-            print(f'Loss: mean:{avg_loss_of_last_episodes:.4f}, std:{std_loss_of_last_episodes:.4f}')
-            print(f'Reward: mean:{avg_reward_of_last_episodes:.4f}, std:{std_reward_of_last_episodes:.4f}')
+            print(f'Loss: {avg_loss_of_last_episodes:.4f} ± {std_loss_of_last_episodes:.4f}')
+            print(f'Reward: {avg_reward_of_last_episodes:.4f} ± {std_reward_of_last_episodes:.4f}')
 
             # printing evaluation logs            
             eval_mean, eval_var = evaluate(wrapped_env, agent, device, num_of_lives_in_each_game=num_of_lives_in_each_game, using_episodic_life=using_episodic_life)
@@ -131,7 +131,7 @@ while total_interactions < max_total_interactions:
 
             # TODO - updating the best model according to mean evaluation scores and saving
             if eval_mean > best_eval_mean:
-                print(f"Changing best model: evaluation reward mean improved by {eval_mean - best_eval_mean:.4f}! (showing up to 4 decimal places)")
+                print(f"Changing best model: evaluation mean reward improved by {eval_mean - best_eval_mean:.4f}!")
                 best_eval_mean = eval_mean
                 agent.save_model(f'{checkpoints_dir_path}best_model_it_{total_interactions}.pt')
 
