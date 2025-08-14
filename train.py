@@ -28,7 +28,7 @@ plots_dirname, training_checkpoints_dirname, best_checkpoints_dirname = create_p
 
 # cofiguration of the environment
 num_of_lives_in_each_game = 5
-env = gym.make(id=game_id, frameskip=1)
+env = gym.make(id=game_id)
 wrappers_lst = [(EpisodicLifeEnv, {}), 
                 (FireResetWithEpisodicLife, {}), 
                 (ClipReward, {}), 
