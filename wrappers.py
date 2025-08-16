@@ -1,7 +1,6 @@
 import numpy as np
 import gymnasium as gym
 from PIL import Image
-from ale_py import ALEInterface
 
 
 class AtariImage(gym.Wrapper):

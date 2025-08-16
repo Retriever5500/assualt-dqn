@@ -1,7 +1,8 @@
 import argparse
 import torch
-import numpy as np
 import gymnasium as gym
+import ale_py
+gym.register_envs(ale_py) # register the Atari environments
 from gymnasium.wrappers import TimeLimit
 from agent import Agent
 from wrappers import AtariImage, ClipReward, FireResetWithoutEpisodicLife, FireResetWithEpisodicLife, EpisodicLifeEnv, BreakoutActionTransform
@@ -14,12 +15,11 @@ def test_model(model_path, env_name, total_games=3, num_of_lives_in_each_game=1,
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     num_of_lives_in_each_game = 5
-    env = gym.make(id=game_id, frameskip=1)
+    env = gym.make(id=game_id, render_mode='human')
     wrappers_lst = [(EpisodicLifeEnv, {}), 
                     (FireResetWithEpisodicLife, {}), 
                     (ClipReward, {}), 
                     (AtariImage, {'image_shape':(84, 84), 'frame_skip': 4}), 
-                    (BreakoutActionTransform, {}),
                     (TimeLimit, {'max_episode_steps': 10000})] # each stack of frames is counted once
     wrapped_env = env
     for wrapper, kwargs in wrappers_lst:

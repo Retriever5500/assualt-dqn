@@ -42,6 +42,6 @@ def plot_logs(game_id, total_interactions, episode_cnt, history_of_total_losses,
 
     plt.tight_layout()
 
-    plot_path = f'{plot_dir_path}plot_{game_id.replace("/", "-")}_it_{total_interactions}'
+    plot_path = f'{plot_dir_path}log_plot_it_{total_interactions}'
     plt.savefig(plot_path)
     plt.show()

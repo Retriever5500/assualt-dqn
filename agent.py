@@ -1,11 +1,6 @@
 import random
 import torch
-import torch.nn as nn
-import torch
-import torch.optim as optim
 import torch.nn.functional as F
-import numpy as np
-import copy
 
 from model import DQNNet
 from memory import Memory
