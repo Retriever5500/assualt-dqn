@@ -2,9 +2,15 @@
 
 ![Game Play](images/gameplay.gif)
 
-# Abstract 
+# Abstract
+We implement a deep learning model to successfully learn control policies in the game of Breakout from frames, based on the DeepMind DQN paper. The model is a convolutional neural network trained with a variant of Q-learning, where the input consists of raw pixels and the output is a value function estimating future rewards. We apply this method to the game of Breakout and achieve a human level of performance.
 
 # Introduction
+The games of Atari serve as a benchmark for evaluating reinforcement learning algorithms due to their challenging dynamics and the necessity for effective control policies. In this study, we leverage the principles outlined in the DeepMind DQN paper to play the game of Breakout, which introduced a novel approach to combining deep learning with reinforcement learning. By utilizing convolutional neural networks, we aim to learn optimal control strategies directly from the raw pixel data of the game, thereby eliminating the need for handcrafted features.
+
+The DQN architecture employs a deep neural network to approximate the Q-value function, which predicts the expected future rewards for each action given a specific state. This allows the model to make informed decisions based on the visual input it receives. Our implementation focuses on the unique challenges posed by Breakout, where the agent must learn to navigate the environment, track the ball, and strategically position the paddle to maximize its score.
+
+Through a series of experiments, we demonstrate that our model not only learns to play Breakout effectively but also achieves performance levels comparable to those of human players. This showcases the potential of deep learning techniques in mastering complex tasks that require real-time decision-making based on visual inputs.
 
 # Methodologies
 
@@ -88,6 +94,7 @@ $
 
 
 # Preprocesing
+Working directly with raw Atari frames, which are 210 x 160 RGB pixel images, can be computationally demanding, so we apply a basic preprocessing step aimed at reducing the input dimensionality. First, to encode a single frame we take the maximum value for each pixel color value over the frame being encoded and the previous frame. The frame is then converted to grayscale and downsampled to an 84 x 84 image. We also stack each of the four frames and repeat the same actions on the four consecutive frames as a way to infer motion.
 
 # Results
 The training loss & reward over 3 million iterations and about 3 thousand episodes is shown in the figure below:
@@ -99,5 +106,19 @@ Though the best model we got in our evaluations was in the eposidoe 21565 and th
 
 
 # Conclusion
+This paper implements the deep learning model introduced in the DeepMind paper on DQN for reinforcement learning and demonstrates its ability to master difficult control policies for Breakout, using only raw pixels as input. The online Q-learning method we implemented combines stochastic mini-batch updates with experience replay memory to facilitate the training of deep networks for reinforcement learning. This approach succeeded in achieving human-level performance in the game of Breakout.
 
 # Appendix
+### Hyperparameters
+- Minibatch size: 32
+- Replay memory size: 50000
+- target network update frequency: 10000
+- discount factor: 0.99
+- learning rate for RMSProp: 0.00025
+- gradient momentum: 0.95
+- squared gradient momentum: 0.95
+- min squared gradient: 0.01
+- initial exploration: 1
+- final exploration: 0.1
+- final exploration frame: 1000000
+- warm-up size: 1000
