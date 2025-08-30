@@ -109,7 +109,7 @@ Though the best model we got in our evaluations was in the eposidoe 21565 and th
 This paper implements the deep learning model introduced in the DeepMind paper on DQN for reinforcement learning and demonstrates its ability to master difficult control policies for Breakout, using only raw pixels as input. The online Q-learning method we implemented combines stochastic mini-batch updates with experience replay memory to facilitate the training of deep networks for reinforcement learning. This approach succeeded in achieving human-level performance in the game of Breakout.
 
 # Appendix
-### A Hyperparameters
+### Hyperparameters
 - Minibatch size: 32
 - Replay memory size: 50000
 - target network update frequency: 10000
